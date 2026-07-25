@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"bufio"
 
 	"charm.land/huh/v2"
 	"charm.land/huh/v2/spinner"
@@ -41,6 +42,8 @@ func main() {
 		cycles    string
 		confirm   bool
 		cyclesInt int
+		work int
+		rest int
 	)
 
 	form := huh.NewForm(
@@ -63,10 +66,10 @@ func main() {
 
 			huh.NewInput().
 				Title("How many Cycles?").
-				Placeholder("1").
+				Prompt("1-4?").
 				Validate(func(s string) error {
 					num, err := strconv.Atoi(s)
-					if err != nil || num < 0 || num > 4 {
+					if err != nil || num < 1 || num > 4 {
 						return errors.New("Not valid input")
 					}
 					return nil
@@ -95,22 +98,56 @@ func main() {
 	prepTimer := func()  {
 		// this really isn't necessary
 		// I just wanted to use it
+		work, rest = getMinutes(mode)
 		time.Sleep(2 * time.Second)
 	}
 
 	_ = spinner.New().Title("Getting ready...").Action(prepTimer).Run()
 
 	for i := 0; i < cyclesInt; i++ {
-		time.Sleep(1 * time.Second)
-		fmt.Printf("cycle %v in mode %v\n", i, mode )
-		if i < cyclesInt - 1 {
-			fmt.Printf("\033[F")
-		}
+		//fmt.Printf("\033[F")
+		fmt.Printf("Get to Work!...\n")
+		runTimer(work)
+		fmt.Printf("Time for a break!\n")
+		runTimer(rest)
+		fmt.Print("Hit ENTER to continue.")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
 	}
 
-	// c := time.Tick(5 * time.Second)
-	// for next := range c {
-	// 	fmt.Printf("%v %s\n", next, statusUpdate())
-	// }
+
+}
+
+func getMinutes(m int) (int, int) {
+	switch m {
+	case 1:
+		return 25, 5
+	case 2:
+		return 1, 1
+	case 3:
+		return 50, 10
+	default:
+		return 0, 0
+	}
+}
+
+func formatTime(totalSeconds int) string {
+	minutes := totalSeconds / 60
+	seconds := totalSeconds % 60
+
+	return fmt.Sprintf("%02dm%02ds", minutes, seconds)
+}
+
+func runTimer(minutes int) {
+	remaining := minutes * 30
+
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	for remaining > 0 {
+		<-ticker.C
+		remaining--
+		fmt.Println(formatTime(remaining))
+		fmt.Printf("\033[F")
+	}
 
 }
