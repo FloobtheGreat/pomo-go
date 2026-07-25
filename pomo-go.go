@@ -21,6 +21,7 @@ const (
 	Long
 )
 
+
 func (t Timer) String() string {
 	switch t {
 	case Standard:
@@ -91,7 +92,7 @@ func main() {
 
 	cyclesInt, _ = strconv.Atoi(cycles)
 
-	prepTimer := func() {
+	prepTimer := func()  {
 		// this really isn't necessary
 		// I just wanted to use it
 		time.Sleep(2 * time.Second)
@@ -99,7 +100,13 @@ func main() {
 
 	_ = spinner.New().Title("Getting ready...").Action(prepTimer).Run()
 
-	fmt.Printf("%v\n%v\n%v\n", mode, cyclesInt, confirm)
+	for i := 0; i < cyclesInt; i++ {
+		time.Sleep(1 * time.Second)
+		fmt.Printf("cycle %v in mode %v\n", i, mode )
+		if i < cyclesInt - 1 {
+			fmt.Printf("\033[F")
+		}
+	}
 
 	// c := time.Tick(5 * time.Second)
 	// for next := range c {
