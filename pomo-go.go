@@ -122,7 +122,7 @@ func getMinutes(m int) (int, int) {
 	case 1:
 		return 25, 5
 	case 2:
-		return 1, 1
+		return 10, 2
 	case 3:
 		return 50, 10
 	default:
@@ -138,7 +138,7 @@ func formatTime(totalSeconds int) string {
 }
 
 func runTimer(minutes int) {
-	remaining := minutes * 30
+	remaining := minutes * 60
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
